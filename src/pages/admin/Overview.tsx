@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Store, Users, ShoppingCart, DollarSign } from 'lucide-react'
 import { adminApi, type AdminOverview, type MonthlyRevenue } from '../../lib/api'
 import { salesData, orders as mockOrders, brands as mockBrands, statusColors, statusLabels } from '../../lib/mockData'
-import { formatCurrency, formatDate } from '../../lib/utils'
+import { formatCurrency } from '../../lib/utils'
 import StatCard from '../../components/ui/StatCard'
 import PageHeader from '../../components/ui/PageHeader'
 
@@ -18,16 +18,12 @@ export default function AdminOverview() {
         const [ov, rev] = await Promise.all([adminApi.overview(), adminApi.revenue()])
         setOverview(ov)
         setMonthly(rev.monthly)
-      } catch {
-        // Backend offline — use mock data
-      } finally {
-        setLoading(false)
-      }
+      } catch { /* use mock */ }
+      finally { setLoading(false) }
     }
     load()
   }, [])
 
-  // Chart data — real or mock
   const chartData = monthly.length > 0
     ? monthly.map(m => ({
         month: new Date(2026, m._id.month - 1).toLocaleString('ar', { month: 'short' }),
@@ -36,21 +32,24 @@ export default function AdminOverview() {
       }))
     : salesData.map(d => ({ ...d, revenue: d.revenue * 4.2, orders: d.orders * 3.8 }))
 
-  const recentOrders = overview?.recentOrders || mockOrders.slice(0, 6)
+  const recentOrders = (overview?.recentOrders || mockOrders.slice(0, 6)) as typeof mockOrders
 
   return (
-    <div className="p-7 space-y-6 max-w-[1200px]">
+    <div className="p-4 md:p-7 space-y-4 md:space-y-6 max-w-[1200px]">
       <PageHeader title="لوحة التحكم" subtitle="نظرة عامة على أداء المنصة" />
 
-      <div className="grid grid-cols-4 gap-4">
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
         <StatCard label="إجمالي الإيرادات" value={formatCurrency(overview?.totalRevenue ?? 375100)} icon={<DollarSign size={15} />} sub="↑ 18% هذا الشهر" />
         <StatCard label="البراندات النشطة" value={String(overview?.totalBrands ?? 3)} icon={<Store size={15} />} />
         <StatCard label="المستخدمين" value={String(overview?.totalUsers ?? 1247)} icon={<Users size={15} />} sub="↑ 34 هذا الأسبوع" />
         <StatCard label="إجمالي الطلبات" value={String(overview?.totalOrders ?? 3218)} icon={<ShoppingCart size={15} />} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2 bg-white rounded-2xl p-5 border border-gray-100">
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Revenue chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-gray-100">
           <div className="mb-5">
             <p className="text-sm font-medium text-gray-800">إيرادات المنصة</p>
             <p className="text-xs text-gray-400 mt-0.5">آخر 6 أشهر {loading && '(جاري التحميل...)'}</p>
@@ -66,6 +65,7 @@ export default function AdminOverview() {
           </ResponsiveContainer>
         </div>
 
+        {/* Brands performance */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-medium text-gray-800 mb-5">أداء البراندات</p>
           <div className="space-y-4">
@@ -85,7 +85,9 @@ export default function AdminOverview() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Bottom row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Orders chart */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-medium text-gray-800 mb-5">الطلبات الشهرية</p>
           <ResponsiveContainer width="100%" height={160}>
@@ -99,13 +101,14 @@ export default function AdminOverview() {
           </ResponsiveContainer>
         </div>
 
+        {/* Recent orders */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-medium text-gray-800 mb-4">آخر الطلبات</p>
           <div className="space-y-3">
-            {(recentOrders as typeof mockOrders).map((o: typeof mockOrders[0]) => (
-              <div key={o.id || (o as { _id?: string })._id} className="flex items-center justify-between py-0.5">
+            {recentOrders.map(o => (
+              <div key={o.id || (o as any)._id} className="flex items-center justify-between py-0.5">
                 <div>
-                  <p className="text-xs font-medium text-gray-700">{o.id || (o as { _id?: string })._id}</p>
+                  <p className="text-xs font-medium text-gray-700">{o.id || (o as any)._id}</p>
                   <p className="text-[11px] text-gray-400 mt-0.5">{o.customer} · {o.brand}</p>
                 </div>
                 <div className="flex items-center gap-2.5">

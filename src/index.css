@@ -17,3 +17,54 @@ body {
 
 /* Select reset */
 select { appearance: none; background-image: none; }
+
+/* ─── Responsive Dashboard ──────────────────────────────── */
+@media (max-width: 1024px) {
+  /* Reduce padding on tablets */
+  .p-7 { padding: 1.25rem !important; }
+}
+
+@media (max-width: 768px) {
+  /* Reduce padding on mobile */
+  .p-7 { padding: 1rem !important; }
+
+  /* 4-col stat grids → 2 cols */
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* 3-col grids → 1 col */
+  .grid-cols-3 { grid-template-columns: repeat(1, 1fr) !important; }
+
+  /* 2-col grids → 1 col */
+  .grid-cols-2 { grid-template-columns: repeat(1, 1fr) !important; }
+
+  /* 5-col grids → 1 col */
+  .grid-cols-5 { grid-template-columns: repeat(1, 1fr) !important; }
+
+  /* Tables — horizontal scroll */
+  .bg-white.rounded-2xl.border.border-gray-100.overflow-hidden {
+    overflow-x: auto !important;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  /* Max width pages */
+  .max-w-\[1200px\] { max-width: 100% !important; }
+  .max-w-\[800px\] { max-width: 100% !important; }
+
+  /* Flex wrap filters */
+  .flex.items-center.gap-3 { flex-wrap: wrap !important; }
+
+  /* Charts height */
+  .recharts-responsive-container { min-height: 160px; }
+}
+
+@media (max-width: 480px) {
+  /* 2-col stat grids → 1 col on very small screens */
+  .grid-cols-4 { grid-template-columns: repeat(1, 1fr) !important; }
+
+  /* Smaller text in tables */
+  table { font-size: 12px; }
+}
+

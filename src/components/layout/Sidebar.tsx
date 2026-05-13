@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { cn } from '../../lib/utils'
 import {
   LayoutDashboard, Package, ShoppingCart, BarChart2,
-  Settings, LogOut, Users, Tag, Percent, Store, FileText, ChevronRight
+  Settings, LogOut, Users, Tag, Percent, Store, FileText, ChevronRight, X
 } from 'lucide-react'
 
 interface NavItem { label: string; to: string; icon: React.ReactNode }
@@ -28,16 +28,20 @@ const adminNav: NavItem[] = [
   { label: 'الإعدادات', to: '/admin/settings', icon: <Settings size={16} /> },
 ]
 
-export default function Sidebar() {
+interface Props { onClose?: () => void }
+
+export default function Sidebar({ onClose }: Props) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const nav = user?.role === 'superadmin' ? adminNav : brandNav
   const isSuperAdmin = user?.role === 'superadmin'
 
+  const handleLogout = () => { logout(); navigate('/login') }
+
   return (
-    <aside className="w-56 bg-white border-l border-gray-100 flex flex-col h-screen sticky top-0 shrink-0">
-      {/* Logo */}
-      <div className="px-5 py-5">
+    <aside className="w-56 bg-white border-l border-gray-100 flex flex-col h-screen shrink-0">
+      {/* Logo + close button */}
+      <div className="px-5 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center">
             <span className="text-white text-xs font-bold">S</span>
@@ -49,6 +53,15 @@ export default function Sidebar() {
             </p>
           </div>
         </div>
+        {/* Close button — mobile only */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="lg:hidden w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       <div className="h-px bg-gray-100 mx-5" />
@@ -63,6 +76,7 @@ export default function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.to === '/brand' || item.to === '/admin'}
+            onClick={onClose}
             className={({ isActive }) => cn(
               'flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all group',
               isActive
@@ -90,7 +104,7 @@ export default function Sidebar() {
           </div>
         </div>
         <button
-          onClick={() => { logout(); navigate('/login') }}
+          onClick={handleLogout}
           className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-gray-400 hover:bg-red-50 hover:text-red-500 w-full transition-colors"
         >
           <LogOut size={14} />
